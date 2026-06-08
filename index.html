@@ -146,25 +146,24 @@ img {
 }
 
 /* BARRE DE SCAN */
-.scan-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -60%;
-    width: 60%;
-    height: 100%;
+.scan-button {
+    position: relative;
+    display: inline-block;
+    text-align: center;
 
-    background: linear-gradient(
-        to right,
-        transparent,
-        rgba(57,255,20,0.4),
-        rgba(57,255,20,0.8),
-        rgba(57,255,20,0.4),
-        transparent
-    );
+    padding: 12px 20px;
+    border: 2px solid #39ff14;
+    color: #39ff14;
+    text-decoration: none;
 
-    transform: skewX(-20deg);
-    animation: scanMove 2.2s infinite;
+    background: rgba(57,255,20,0.05);
+    overflow: hidden;
+
+    box-shadow:
+        0 0 10px rgba(57,255,20,0.4),
+        inset 0 0 6px rgba(57,255,20,0.2);
+
+    text-shadow: 0 0 6px #39ff14;
 }
 
 /* animation scan */
@@ -185,7 +184,20 @@ img {
     font-family: "Courier New", monospace;
     letter-spacing: 1px;
 }
-    
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+}
+ 
+.button-subtitle {
+    margin-top: 4px;
+    font-size: 10px;
+    opacity: 0.65;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+} 
 </style>
 </head>
 
@@ -221,9 +233,16 @@ RAPPORT SCIENTIFIQUE :
 CONCLUSION :
 
 LA FICELLE INDIQUE QUE VOUS DEVEZ SIMPLEMENT REGARDER DEHORS.
+<br>
 </pre>
-<a href="radarV1.html" class="scan-button">📡 ACCÉDER AU RADAR DE FICELLE</a>
-</a>
+<div class="button-container">
+    <a href="radarV1.html" class="scan-button">
+        <div>📡 ACCÉDER AU RADAR DE FICELLE</div>
+        <div class="button-subtitle">
+            Accès réservé aux opérateurs certifiés ficelle niveau 1
+        </div>
+    </a>
+</div>
 <br><br>
 
 <img src="panneau.jpg" alt="Photo Baromètre Ardennais">
@@ -239,7 +258,8 @@ VERSION : 2.7 // ARDENNES DEEP WEATHER INTELLIGENCE
     Financement obtenu dans le cadre du Programme Horizon Ficelle 2040<br>
     Aucune ficelle n'a été blessée durant cette analyse<br>
     Précision des prévisions : ±100 %<br>
-    En cas de divergence entre la ficelle et la météo, la météo fait foi.<br>
+    En cas de divergence entre la ficelle et la météo, la météo fait foi<br>
+    Les conclusions du CADAF ne remplacent pas un regard par la fenêtre<br>
     Temps moyen de calcul : 0,3 seconde<br>
     Temps moyen de mise en scène : 18 secondes<br>
     Dernier audit qualité : concluant<br>
@@ -268,6 +288,18 @@ let i = 0;
 let charIndex = 0;
 let current = "";
 
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("direct") === "1") {
+
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+
+} else {
+
+    typeWriter();
+
+}
 function typeWriter() {
     if (i >= messages.length) {
         document.getElementById("result").classList.remove("hidden");
