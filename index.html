@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baromètre Ardennais - Accès sécurisé</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background: #0f1720;
+    color: #e8e6e3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    background: #1b2430;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    text-align: center;
+}
+
+h1 {
+    margin-top: 0;
+    color: #7dd3fc;
+}
+
+#loading {
+    font-family: monospace;
+    text-align: left;
+    background: #0b0f14;
+    padding: 15px;
+    border-radius: 8px;
+    height: 180px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 20px;
+    border: 2px solid #334155;
+}
+
+.button {
+    margin-top: 20px;
+    padding: 10px 18px;
+    background: #38bdf8;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.footer {
+    margin-top: 20px;
+    font-size: 0.8em;
+    color: #94a3b8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🌦️ BAROMÈTRE ARDENNAIS</h1>
+<p>Portail sécurisé - Institut Ardennais de Prévision Météorologique</p>
+
+<div id="loading"></div>
+
+<div id="result" class="hidden">
+
+    <h2>Analyse terminée</h2>
+
+    <p><strong>Rapport scientifique :</strong></p>
+
+    <p>✔ Ficelle détectée dans l’environnement</p>
+    <p>✔ Oscillations compatibles avec vent local</p>
+    <p>✔ Corrélation météo : indéterminée (comme d’habitude)</p>
+
+    <p><strong>Conclusion :</strong></p>
+    <p style="font-size: 1.2em;">
+        La ficelle indique que vous devriez simplement regarder dehors.
+    </p>
+
+    <img src="panneau.jpg" alt="Panneau Baromètre Ardennais">
+
+    <p class="footer">
+        Version 2.7 “Ardennes Deep Weather Intelligence”
+    </p>
+</div>
+
+</div>
+
+<script>
+const log = document.getElementById("loading");
+
+const messages = [
+"Connexion au réseau météorologique européen...",
+"Synchronisation avec 14 satellites...",
+"Analyse des nuages en cours...",
+"Lecture de la ficelle...",
+"Ficelle détectée : OUI",
+"Calcul des probabilités météo...",
+"Erreur : trop de variabilité atmosphérique",
+"Recalibrage des modèles...",
+"Consultation de l’expertise locale...",
+"Consensus scientifique : regardez le ciel"
+];
+
+let i = 0;
+
+function showLog() {
+    if (i < messages.length) {
+        log.innerHTML += messages[i] + "<br>";
+        i++;
+        setTimeout(showLog, 700);
+    } else {
+        setTimeout(() => {
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("result").classList.remove("hidden");
+        }, 800);
+    }
+}
+
+showLog();
+</script>
+
+</body>
+</html>
