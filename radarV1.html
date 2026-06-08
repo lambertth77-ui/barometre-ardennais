@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>CADAF - Radar de ficelle</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: #39ff14;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+}
+
+/* écran CRT */
+.crt {
+    position: relative;
+    min-height: 100vh;
+    padding: 20px;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 40, 0, 0.6),
+        black 70%
+    );
+    animation: flicker 0.15s infinite;
+}
+
+/* scanlines */
+.crt::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
+
+/* flicker */
+@keyframes flicker {
+    0% { opacity: 0.95; }
+    50% { opacity: 1; }
+    100% { opacity: 0.97; }
+}
+
+/* layout */
+.container {
+    max-width: 900px;
+    margin: auto;
+    text-align: center;
+}
+
+canvas {
+    margin-top: 20px;
+    border-radius: 50%;
+}
+
+/* log terminal */
+.status {
+    margin-top: 20px;
+    text-align: left;
+    white-space: pre-line;
+    font-size: 14px;
+    line-height: 1.4;
+    text-shadow: 0 0 5px #39ff14;
+    min-height: 200px;
+}
+
+.scan-button {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 18px;
+
+    border: 2px solid #39ff14;
+    color: #39ff14;
+    text-decoration: none;
+
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    background: rgba(57,255,20,0.05);
+    overflow: hidden;
+
+    box-shadow:
+        0 0 10px rgba(57,255,20,0.4),
+        inset 0 0 6px rgba(57,255,20,0.2);
+
+    text-shadow: 0 0 6px #39ff14;
+}
+
+/* effet hover */
+.scan-button:hover {
+    background: rgba(57,255,20,0.12);
+    transform: scale(1.03);
+}
+
+/* BARRE DE SCAN */
+.scan-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 60%;
+    height: 100%;
+
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(57,255,20,0.4),
+        rgba(57,255,20,0.8),
+        rgba(57,255,20,0.4),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+    animation: scanMove 2.2s infinite;
+}
+
+/* animation scan */
+@keyframes scanMove {
+    0% {
+        left: -60%;
+    }
+    100% {
+        left: 120%;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="crt">
+
+<div class="container">
+<a href="index.html" class="scan-button">[ SYSTEM EXIT ] RETURN TO MAIN PORTAL</a>
+
+<h2>CADAF // TERMINAL MÉTÉOROLOGIQUE ARDENNAIS</h2>
+<p style="font-size:9px; opacity:0.5; font-family:'Courier New', monospace;">
+CADAF : Centre Ardennais de Détection Atmosphérique par Ficelle
+</p>
+<p>System status: OPERATIONAL (since 1987)</p>
+
+<canvas id="radar" width="400" height="400"></canvas>
+
+<div class="status" id="log"></div>
+
+</div>
+
+</div>
+
+<script>
+
+// ---------------- RADAR ----------------
+const canvas = document.getElementById("radar");
+const ctx = canvas.getContext("2d");
+
+let angle = 0;
+let speed = 0.006;
+
+function drawRadar() {
+    const center = 200;
+
+    ctx.clearRect(0, 0, 400, 400);
+
+    ctx.strokeStyle = "#39ff14";
+    ctx.shadowColor = "#39ff14";
+    ctx.shadowBlur = 10;
+
+    // cercles
+    for (let r = 50; r <= 200; r += 50) {
+        ctx.beginPath();
+        ctx.arc(center, center, r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // balayage
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.lineTo(
+        center + 200 * Math.cos(angle),
+        center + 200 * Math.sin(angle)
+    );
+    ctx.stroke();
+
+    angle += speed;
+
+    // faux signal ficelle
+    if (Math.random() > 0.93) {
+        ctx.fillStyle = "#39ff14";
+        const fx = center + Math.random() * 180 * Math.cos(Math.random() * Math.PI * 2);
+        const fy = center + Math.random() * 180 * Math.sin(Math.random() * Math.PI * 2);
+
+        ctx.beginPath();
+        ctx.arc(fx, fy, 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    requestAnimationFrame(drawRadar);
+}
+
+drawRadar();
+
+// ---------------- LOG TYPEWRITER ----------------
+
+const messages = [
+"INITIALISATION DU SYSTÈME CADAF...",
+"CONNEXION AUX SATELLITES ARDENNAIS...",
+"LECTURE DE LA FICELLE PRINCIPALE...",
+"ANALYSE DES OSCILLATIONS ATMOSPHÉRIQUES...",
+"SIGNAL: STABLE INSTABLE",
+"SYNCHRONISATION AVEC LE VENT LOCAL...",
+"ERREUR 0xFICELLE: INTERPRÉTATION VARIABLE",
+"INTERROGATION DU SANGLIER MÉTÉOROLOGIQUE PRINCIPAL...",
+"LE SANGLIER REFUSE DE COMMENTER LA MÉTÉO...",
+"ÉVALUATION DU RISQUE SANGLIER (NIVEAU 3)...",
+"RÉSULTAT: PRÉVISION NON DÉTERMINÉE",
+"CONCLUSION: REGARDER DEHORS"
+];
+
+const log = document.getElementById("log");
+
+let i = 0;
+let charIndex = 0;
+let currentLine = "";
+
+function typeWriter() {
+    if (i >= messages.length) return;
+
+    let fullText = messages[i];
+
+    if (charIndex < fullText.length) {
+        currentLine += fullText.charAt(charIndex);
+
+        log.innerHTML =
+            messages.slice(0, i).join("<br>") +
+            "<br>" +
+            currentLine + "_";
+
+        charIndex++;
+
+        setTimeout(typeWriter, 25); // vitesse écriture
+    } else {
+        log.innerHTML += "<br>";
+        i++;
+        charIndex = 0;
+        currentLine = "";
+
+        setTimeout(typeWriter, 1000); // pause entre lignes
+    }
+}
+
+typeWriter();
+
+</script>
+
+</body>
+</html>
